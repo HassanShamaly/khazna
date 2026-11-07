@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; worker-src 'self'; manifest-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>خزنتي</title>
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --surface-2:#eef1f4; --text:#14181d; --muted:#5d6672;
+  --border:#dfe3e8; --accent:#0f766e; --accent-ink:#ffffff; --accent-soft:#e1f3f1;
+  --danger:#b42318; --danger-soft:#fdecea; --warn-soft:#fff6e0; --warn-ink:#7a4b00;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06); --radius:14px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1114; --surface:#161a1f; --surface-2:#1e242b; --text:#e8ebee; --muted:#9aa4ae;
+    --border:#2a313a; --accent:#2dd4bf; --accent-ink:#04211e; --accent-soft:#0f2d2a;
+    --danger:#f97066; --danger-soft:#3a1a18; --warn-soft:#33270d; --warn-ink:#f5c46b;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:system-ui,"Segoe UI",Tahoma,"Noto Sans Arabic","Noto Naskh Arabic",sans-serif;font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
+button,input,textarea{font:inherit;color:inherit}
+.mono{font-family:ui-monospace,Consolas,"Cascadia Mono",Menlo,monospace}
+.muted{color:var(--muted)}
+.screen{min-height:100vh;min-height:100dvh}
+.center{display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.auth{width:100%;max-width:400px;padding:28px 24px;text-align:center}
+.auth h1{margin:8px 0 4px;font-size:1.6rem}
+.auth p{margin:0 0 20px;font-size:.95rem}
+.logo{width:56px;height:56px;margin:0 auto;border-radius:16px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+form{text-align:start}
+label{display:block;font-size:.9rem;font-weight:600;margin:0 0 14px}
+label>input,label>textarea,.field input{display:block;width:100%;margin-top:6px}
+input[type=text],input[type=password],input[type=search],input[type=url],input[type=number],textarea{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;outline:none;min-height:46px}
+textarea{min-height:90px;resize:vertical}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);background:var(--surface);
+  border-radius:10px;padding:10px 16px;min-height:44px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.danger{color:var(--danger);border-color:var(--danger-soft);background:var(--danger-soft)}
+.btn.block{width:100%}
+.btn svg,.icon-btn svg{width:18px;height:18px;flex:none}
+.link{background:none;border:0;color:var(--accent);cursor:pointer;margin-top:14px;font-weight:600;padding:8px}
+.msg{min-height:1.5em;font-size:.9rem;color:var(--danger);margin:-4px 0 10px}
+.note{font-size:.85rem;color:var(--muted);margin:0 0 14px}
+
+/* main */
+.wrap{max-width:780px;margin:0 auto;padding:0 16px 110px}
+.topbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px}
+.toprow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;flex:1}
+.brand .logo{width:36px;height:36px;border-radius:10px;margin:0}
+.brand .logo svg{width:20px;height:20px}
+.count{font-weight:500;font-size:.85rem;color:var(--muted)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:44px;min-height:44px;padding:0 10px;
+  border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;color:var(--text)}
+.icon-btn:hover{background:var(--surface-2)}
+.search{position:relative}
+.search input{width:100%;padding-inline-start:42px;font-size:1rem;min-height:50px;border-radius:12px}
+.search svg{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);width:19px;height:19px;color:var(--muted);pointer-events:none}
+.banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn-ink);border-radius:12px;padding:10px 14px;margin:4px 0 12px;font-size:.9rem}
+.banner span{flex:1;min-width:180px}
+.banner .btn{min-height:36px;padding:6px 12px}
+.list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 8px 8px 8px}
+.item-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:0;padding:4px;text-align:start;cursor:pointer;border-radius:8px}
+.avatar{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:700;flex:none;color:#fff}
+.item-text{min-width:0}
+.item-title{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-sub{font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:.75rem;background:var(--surface-2);color:var(--muted);border-radius:6px;padding:0 6px;margin-inline-start:6px;vertical-align:middle}
+.item-actions{display:flex;gap:6px;flex:none}
+.item-actions .lbl{font-size:.82rem;font-weight:600}
+.item.first{border-color:var(--accent)}
+.empty{text-align:center;color:var(--muted);padding:48px 16px}
+.empty .btn{margin-top:12px}
+.fab{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));inset-inline-start:50%;transform:translateX(50%);
+  box-shadow:0 6px 20px rgba(15,118,110,.35);border-radius:999px;padding:12px 24px;min-height:52px;z-index:6}
+.kbd-hint{font-size:.8rem;color:var(--muted);margin:6px 2px 0}
+
+/* dialogs */
+dialog{border:1px solid var(--border);border-radius:16px;padding:0;background:var(--surface);color:var(--text);
+  width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(10,14,18,.55)}
+.dlg-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.dlg-head h2{margin:0;font-size:1.1rem}
+.dlg-body{padding:18px 20px;overflow:auto}
+.dlg-foot{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap}
+.dlg-foot .spacer{flex:1}
+.pw-row{display:flex;gap:6px;margin-top:6px}
+.pw-row input{flex:1;min-width:0;margin:0!important}
+.gen{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:8px 0 14px;font-weight:500}
+.gen input[type=number]{width:76px;min-height:36px;padding:4px 8px}
+.gen label{display:inline-flex;align-items:center;gap:6px;margin:0;font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.set-group{margin-bottom:18px}
+.set-group h3{font-size:.85rem;color:var(--muted);margin:0 0 8px;font-weight:600}
+.set-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:12px 14px;border:1px solid var(--border);
+  border-radius:12px;background:var(--surface);cursor:pointer;margin-bottom:8px}
+.set-btn:hover{background:var(--surface-2)}
+.set-btn svg{width:20px;height:20px;color:var(--accent);flex:none}
+.set-btn small{display:block;color:var(--muted);font-size:.8rem}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);
+  padding:10px 16px;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:.2s;z-index:50;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (max-width:520px){
+  .item-actions .lbl{display:none}
+  .grid2{grid-template-columns:1fr}
+  .kbd-hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- شاشة الخطأ -->
+<section id="screen-error" class="screen center" hidden>
+  <div class="card auth">
+    <h1>التخزين غير متاح</h1>
+    <p class="muted">هذا المتصفح يمنع حفظ البيانات (قد يكون وضع التصفح الخفي). افتح الملف في نافذة عادية في Chrome أو Edge.</p>
+  </div>
+</section>
+
+<!-- إنشاء الخزنة -->
+<section id="screen-setup" class="screen center" hidden>
+  <div class="card auth">
+    <div class="logo" data-icon="lock"></div>
+    <h1>خزنتي</h1>
+    <p class="muted">أنشئ كلمة مرور رئيسية. هي المفتاح الوحيد لفتح الخزنة، ولا يمكن استرجاعها إذا نسيتها.</p>
+    <form id="setup-form" autocomplete="off" novalidate>
+      <label>كلمة المرور الرئيسية
+        <input type="password" id="setup-pw" dir="ltr" autocomplete="new-password">
+      </label>
+      <label>تأكيد كلمة المرور
+        <input type="password" id="setup-pw2" dir="ltr" autocomplete="new-password">
+      </label>
+      <p class="note">10 أحرف على الأقل. الأفضل جملة من أربع كلمات أو أكثر تحفظها جيدًا.</p>
+      <p class="msg" id="setup-msg"></p>
+      <button class="btn primary block" type="submit" id="setup-btn">إنشاء الخزنة</button>
+    </form>
+    <button class="link" type="button" data-action="restore">عندي نسخة احتياطية ← استعادة</button>
+  </div>
+</section>
+
+<!-- فتح الخزنة -->
+<section id="screen-unlock" class="screen center" hidden>
+  <div class="card auth">
+    <div class="logo" data-icon="lock"></div>
+    <h1>خزنتي</h1>
+    <p class="muted">الخزنة مقفلة</p>
+    <form id="unlock-form" autocomplete="off" novalidate>
+      <label>كلمة المرور الرئيسية
+        <input type="password" id="unlock-pw" dir="ltr" autocomplete="current-password">
+      </label>
+      <p class="msg" id="unlock-msg"></p>
+      <button class="btn primary block" type="submit" id="unlock-btn">فتح</button>
+    </form>
+    <button class="link" type="button" data-action="restore">استعادة من نسخة احتياطية</button>
+  </div>
+</section>
+
+<!-- الشاشة الرئيسية -->
+<section id="screen-main" class="screen" hidden>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="toprow">
+        <div class="brand"><div class="logo" data-icon="lock"></div><span>خزنتي</span><span class="count" id="count"></span></div>
+        <button class="icon-btn" type="button" id="btn-settings" title="الإعدادات والنسخ الاحتياطي" aria-label="الإعدادات" data-icon="gear"></button>
+        <button class="icon-btn" type="button" id="btn-lock" title="قفل الخزنة" aria-label="قفل" data-icon="lock"></button>
+      </div>
+      <div class="search">
+        <span data-icon="search"></span>
+        <input type="search" id="search" placeholder="ابحث باسم الحساب أو المستخدم أو الموقع..." autocomplete="off" spellcheck="false" enterkeyhint="search">
+      </div>
+      <p class="kbd-hint">اختصارات: / للبحث · Enter ينسخ كلمة مرور أول نتيجة · Esc يمسح البحث</p>
+    </header>
+    <div class="banner" id="backup-banner" hidden>
+      <span id="backup-banner-text"></span>
+      <button class="btn" type="button" data-action="export">نسخة احتياطية الآن</button>
+    </div>
+    <ul class="list" id="list"></ul>
+    <div class="empty" id="empty" hidden></div>
+  </div>
+  <button class="btn primary fab" type="button" id="btn-add"><span data-icon="plus"></span>إضافة حساب</button>
+</section>
+
+<!-- نافذة الإضافة والتعديل -->
+<dialog id="editor">
+  <form id="editor-form" autocomplete="off" novalidate>
+    <div class="dlg-head"><h2 id="editor-title">حساب جديد</h2>
+      <button class="icon-btn" type="button" data-close aria-label="إغلاق" data-icon="x"></button></div>
+    <div class="dlg-body">
+      <label>اسم الحساب *
+        <input type="text" id="f-name" dir="auto" placeholder="مثال: Gmail الشخصي">
+      </label>
+      <label>اسم المستخدم / البريد
+        <span class="pw-row">
+          <input type="text" id="f-username" dir="ltr" autocapitalize="off" spellcheck="false">
+          <button class="icon-btn" type="button" id="f-copy-user" title="نسخ" aria-label="نسخ اسم المستخدم" data-icon="copy"></button>
+        </span>
+      </label>
+      <label>كلمة المرور
+        <span class="pw-row">
+          <input type="password" id="f-password" class="mono" dir="ltr" autocomplete="new-password" spellcheck="false">
+          <button class="icon-btn" type="button" id="f-toggle" title="إظهار/إخفاء" aria-label="إظهار كلمة المرور" data-icon="eye"></button>
+          <button class="icon-btn" type="button" id="f-copy-pw" title="نسخ" aria-label="نسخ كلمة المرور" data-icon="copy"></button>
+        </span>
+      </label>
+      <div class="gen">
+        <button class="btn" type="button" id="f-generate"><span data-icon="dice"></span>توليد كلمة مرور</button>
+        <label>الطول <input type="number" id="g-len" min="8" max="64" value="20"></label>
+        <label><input type="checkbox" id="g-sym" checked> رموز</label>
+      </div>
+      <div class="grid2">
+        <label>رابط الموقع
+          <input type="url" id="f-url" dir="ltr" placeholder="https://" autocapitalize="off" spellcheck="false">
+        </label>
+        <label>المجلد
+          <input type="text" id="f-folder" dir="auto" list="folders" placeholder="عمل، بنوك، شخصي...">
+        </label>
+      </div>
+      <datalist id="folders"></datalist>
+      <label>ملاحظات
+        <textarea id="f-notes" dir="auto"></textarea>
+      </label>
+      <p class="msg" id="editor-msg"></p>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn primary" type="submit">حفظ</button>
+      <button class="btn" type="button" data-close>إلغاء</button>
+      <span class="spacer"></span>
+      <button class="btn danger" type="button" id="f-delete" hidden>حذف</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- نافذة الإعدادات -->
+<dialog id="settings">
+  <div class="dlg-head"><h2>الإعدادات</h2>
+    <button class="icon-btn" type="button" data-close aria-label="إغلاق" data-icon="x"></button></div>
+  <div class="dlg-body">
+    <div class="set-group">
+      <h3>النسخ الاحتياطي والنقل بين الأجهزة</h3>
+      <button class="set-btn" type="button" data-action="export"><span data-icon="download"></span>
+        <span>تنزيل نسخة احتياطية مشفرة<small id="last-backup"></small></span></button>
+      <button class="set-btn" type="button" data-action="restore"><span data-icon="upload"></span>
+        <span>استعادة من نسخة احتياطية<small>تستبدل محتوى الخزنة على هذا الجهاز</small></span></button>
+    </div>
+    <div class="set-group">
+      <h3>الاستيراد</h3>
+      <button class="set-btn" type="button" data-action="import-bw"><span data-icon="import"></span>
+        <span>استيراد من Bitwarden<small>ملف JSON غير مشفر — يُضاف للحسابات الحالية دون تكرار</small></span></button>
+    </div>
+    <div class="set-group">
+      <h3>الأمان</h3>
+      <button class="set-btn" type="button" data-action="change-pw"><span data-icon="key"></span>
+        <span>تغيير كلمة المرور الرئيسية<small>القفل التلقائي: بعد 5 دقائق بلا نشاط، أو دقيقة من مغادرة الصفحة</small></span></button>
+    </div>
+    <p class="note">البيانات محفوظة مشفرة (AES-256-GCM) في هذا المتصفح فقط، والصفحة ممنوعة من الاتصال بالإنترنت. مسح بيانات المتصفح يمسح الخزنة، فاحتفظ بنسخة احتياطية حديثة دائمًا.</p>
+  </div>
+</dialog>
+
+<!-- نافذة طلب كلمة مرور -->
+<dialog id="pwdialog">
+  <form id="pw-form" autocomplete="off" novalidate>
+    <div class="dlg-head"><h2 id="pw-title"></h2></div>
+    <div class="dlg-body">
+      <p class="note" id="pw-msg"></p>
+      <label><span id="pw-label1">كلمة المرور</span>
+        <input type="password" id="pw-1" dir="ltr" autocomplete="off">
+      </label>
+      <label id="pw-2-wrap">تأكيد كلمة المرور
+        <input type="password" id="pw-2" dir="ltr" autocomplete="off">
+      </label>
+      <p class="msg" id="pw-err"></p>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn primary" type="submit" id="pw-ok">متابعة</button>
+      <button class="btn" type="button" id="pw-cancel">إلغاء</button>
+    </div>
+  </form>
+</dialog>
+
+<input type="file" id="file-backup" accept=".json,application/json" hidden>
+<input type="file" id="file-bw" accept=".json,application/json" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+(() => {
+  // ===== الإعدادات =====
+  const STORE_KEY = 'khazna.vault.v1';
+  const META_KEY = 'khazna.meta.v1';
+  const ITER = 600000;              // تكرارات PBKDF2-SHA256
+  const AUTO_LOCK_MS = 5 * 60 * 1000;
+  const HIDDEN_LOCK_MS = 60 * 1000;
+  const CLIP_CLEAR_MS = 30 * 1000;
+  const BACKUP_REMIND_DAYS = 7;
+  const AAD = new TextEncoder().encode('khazna-v1');
+  const enc = new TextEncoder(), dec = new TextDecoder();
+
+  const state = { key: null, salt: null, iter: ITER, items: [], visible: [], editingId: null, lockTimer: null };
+  const $ = (s) => document.querySelector(s);
+
+  // ===== الأيقونات =====
+  const ICONS = {
+    lock: '<path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="4.5" y="11" width="15" height="10" rx="2.5"/><path d="M12 15v2"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    x: '<path d="M18 6 6 18M6 6l12 12"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+    key: '<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M14.5 8.5l2 2"/>',
+    open: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+    eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    dice: '<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+    download: '<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
+    upload: '<path d="M12 21V9M7 14l5-5 5 5M4 3h16"/>',
+    import: '<path d="M4 4h16v6M4 4v16h16v-6M10 14l4-4M10 10h4v4"/>'
+  };
+  function icon(name) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[name] + '</svg>';
+  }
+  document.querySelectorAll('[data-icon]').forEach((e) => { e.insertAdjacentHTML('afterbegin', icon(e.dataset.icon)); });
+
+  // ===== أدوات =====
+  function b64(buf) { const b = new Uint8Array(buf); let s = ''; for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s); }
+  function unb64(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return b; }
+  function randBytes(n) { return crypto.getRandomValues(new Uint8Array(n)); }
+  function randInt(n) { const u = new Uint32Array(1); const max = Math.floor(0x100000000 / n) * n; do { crypto.getRandomValues(u); } while (u[0] >= max); return u[0] % n; }
+  function newId() { return Array.from(randBytes(12), (x) => x.toString(16).padStart(2, '0')).join(''); }
+  function str(v, max = 20000) { return v == null ? '' : String(v).slice(0, max); }
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function norm(s) {
+    return str(s).toLowerCase().normalize('NFKD')
+      .replace(/[\u0300-\u036f\u064B-\u065F\u0670\u0640]/g, '')
+      .replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
+  }
+  function withProto(u) { u = str(u).trim(); if (!u) return ''; return /^[a-z][a-z0-9+.-]*:/i.test(u) ? u : 'https://' + u; }
+  function host(u) { try { return new URL(withProto(u)).hostname.replace(/^www\./, ''); } catch (e) { return str(u); } }
+  function fmtDate(t) { try { return new Date(t).toLocaleDateString('ar-SA-u-ca-gregory', { year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) { return new Date(t).toISOString().slice(0, 10); } }
+
+  let toastTimer = null;
+  function toast(text, ms = 2600) {
+    const t = $('#toast'); t.textContent = text; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  // ===== التشفير =====
+  async function deriveKey(pw, salt, iter) {
+    const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base,
+      { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function encryptVault(key, salt, iter, items) {
+    const iv = randBytes(12);
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD }, key, enc.encode(JSON.stringify({ items })));
+    return { app: 'khazna', v: 1, kdf: 'PBKDF2-SHA256', iter, salt: b64(salt), iv: b64(iv), ct: b64(ct) };
+  }
+  async function decryptVault(blob, pw) {
+    if (!blob || blob.app !== 'khazna' || blob.v !== 1) throw new Error('format');
+    const iter = Number(blob.iter);
+    if (!Number.isInteger(iter) || iter < 100000 || iter > 5000000) throw new Error('format');
+    const salt = unb64(blob.salt);
+    const key = await deriveKey(pw, salt, iter);
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(blob.iv), additionalData: AAD }, key, unb64(blob.ct));
+    const data = JSON.parse(dec.decode(pt));
+    const items = (Array.isArray(data.items) ? data.items : []).map(cleanItem);
+    return { key, salt, iter, items };
+  }
+  function cleanItem(it) {
+    return {
+      id: str(it.id, 64) || newId(), name: str(it.name, 300), username: str(it.username, 500), password: str(it.password, 2000),
+      url: str(it.url, 2000), folder: str(it.folder, 100), notes: str(it.notes), created: Number(it.created) || Date.now(), updated: Number(it.updated) || Date.now()
+    };
+  }
+
+  // ===== التخزين =====
+  function readBlob() { try { const s = localStorage.getItem(STORE_KEY); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+  function writeBlob(blob) { localStorage.setItem(STORE_KEY, JSON.stringify(blob)); lastWritten = JSON.stringify(blob); }
+  let lastWritten = null;
+  function readMeta() { try { return JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch (e) { return {}; } }
+  function writeMeta(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) { } }
+  async function save() {
+    const blob = await encryptVault(state.key, state.salt, state.iter, state.items);
+    writeBlob(blob);
+  }
+  function requestPersist() { try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { } }
+
+  // ===== الشاشات =====
+  function show(name) {
+    ['error', 'setup', 'unlock', 'main'].forEach((n) => { $('#screen-' + n).hidden = n !== name; });
+  }
+  function closeDialogs() { document.querySelectorAll('dialog[open]').forEach((d) => d.close()); }
+
+  function boot() {
+    try { localStorage.setItem('khazna.test', '1'); localStorage.removeItem('khazna.test'); }
+    catch (e) { show('error'); return; }
+    if (!window.crypto || !crypto.subtle) { show('error'); $('#screen-error p').textContent = 'هذا المتصفح لا يدعم التشفير المطلوب. استخدم إصدارًا حديثًا من Chrome أو Edge.'; return; }
+    if (readBlob()) { show('unlock'); $('#unlock-pw').focus(); } else { show('setup'); $('#setup-pw').focus(); }
+  }
+
+  function setBusy(btn, busy, text) {
+    btn.disabled = busy;
+    if (busy) { btn.dataset.text = btn.textContent; btn.textContent = text || 'لحظة...'; }
+    else if (btn.dataset.text) btn.textContent = btn.dataset.text;
+  }
+
+  $('#setup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = $('#setup-pw').value, pw2 = $('#setup-pw2').value, msg = $('#setup-msg');
+    if (pw.length < 10) { msg.textContent = 'كلمة المرور قصيرة: 10 أحرف على الأقل.'; return; }
+    if (pw !== pw2) { msg.textContent = 'التأكيد لا يطابق كلمة المرور.'; return; }
+    msg.textContent = '';
+    const btn = $('#setup-btn'); setBusy(btn, true, 'جارٍ الإنشاء...');
+    try {
+      state.salt = randBytes(16); state.iter = ITER;
+      state.key = await deriveKey(pw, state.salt, ITER); state.items = [];
+      await save(); requestPersist(); enterMain();
+    } catch (err) { msg.textContent = 'تعذر إنشاء الخزنة: ' + err.message; }
+    finally { setBusy(btn, false); }
+  });
+
+  $('#unlock-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = $('#unlock-pw').value, msg = $('#unlock-msg');
+    if (!pw) return;
+    const btn = $('#unlock-btn'); setBusy(btn, true, 'جارٍ الفتح...'); msg.textContent = '';
+    try { Object.assign(state, await decryptVault(readBlob(), pw)); enterMain(); }
+    catch (err) { msg.textContent = 'كلمة المرور غير صحيحة.'; $('#unlock-pw').select(); }
+    finally { setBusy(btn, false); }
+  });
+
+  function enterMain() {
+    $('#setup-pw').value = ''; $('#setup-pw2').value = ''; $('#unlock-pw').value = '';
+    lastWritten = localStorage.getItem(STORE_KEY);
+    show('main'); $('#search').value = ''; render(); updateBanner(); bump();
+    if (matchMedia('(pointer:fine)').matches) $('#search').focus();
+  }
+
+  function lock(reason) {
+    if (!state.key) return;
+    state.key = null; state.salt = null; state.items = []; state.visible = []; state.editingId = null;
+    clearTimeout(state.lockTimer);
+    closeDialogs();
+    $('#list').replaceChildren(); $('#search').value = '';
+    ['#f-name', '#f-username', '#f-password', '#f-url', '#f-folder', '#f-notes'].forEach((s) => { $(s).value = ''; });
+    show(readBlob() ? 'unlock' : 'setup');
+    $('#unlock-msg').textContent = reason || '';
+    if (matchMedia('(pointer:fine)').matches) $('#unlock-pw').focus();
+  }
+
+  // القفل التلقائي
+  function bump() {
+    if (!state.key) return;
+    clearTimeout(state.lockTimer);
+    state.lockTimer = setTimeout(() => lock('أُقفلت تلقائيًا بعد عدم النشاط.'), AUTO_LOCK_MS);
+  }
+  ['pointerdown', 'keydown', 'input'].forEach((ev) => document.addEventListener(ev, bump, { passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (!state.key) return;
+    if (document.hidden) { clearTimeout(state.lockTimer); state.lockTimer = setTimeout(() => lock('أُقفلت تلقائيًا بعد مغادرة الصفحة.'), HIDDEN_LOCK_MS); }
+    else bump();
+  });
+  // حماية من التعديل من نافذتين في الوقت نفسه
+  window.addEventListener('storage', (e) => {
+    if (e.key === STORE_KEY && state.key && e.newValue !== lastWritten) lock('تغيرت الخزنة من نافذة أخرى. افتحها من جديد.');
+  });
+
+  // ===== العرض =====
+  function avatarColor(s) { let h = 0; for (const c of str(s)) h = (h * 31 + c.codePointAt(0)) % 360; return 'hsl(' + h + ' 45% 42%)'; }
+
+  function render() {
+    const terms = norm($('#search').value).split(/\s+/).filter(Boolean);
+    let items = state.items.slice();
+    if (terms.length) {
+      items = items.filter((it) => { const hay = norm([it.name, it.username, it.url, it.folder, it.notes].join(' ')); return terms.every((t) => hay.includes(t)); });
+    }
+    items.sort((a, b) => {
+      if (terms.length) {
+        const an = norm(a.name).startsWith(terms[0]) ? 0 : 1, bn = norm(b.name).startsWith(terms[0]) ? 0 : 1;
+        if (an !== bn) return an - bn;
+      }
+      return a.name.localeCompare(b.name, 'ar', { sensitivity: 'base' });
+    });
+    state.visible = items;
+    $('#list').replaceChildren(...items.map((it, i) => row(it, i === 0 && terms.length > 0)));
+    $('#count').textContent = state.items.length ? '(' + state.items.length + ')' : '';
+    const empty = $('#empty');
+    if (!state.items.length) {
+      empty.replaceChildren(el('p', null, 'الخزنة فارغة.'), el('p', null, 'أضف أول حساب، أو استورد حساباتك من Bitwarden من الإعدادات.'));
+      const b = el('button', 'btn', 'استيراد من Bitwarden'); b.type = 'button'; b.addEventListener('click', () => $('#file-bw').click());
+      empty.append(b); empty.hidden = false;
+    } else if (!items.length) {
+      empty.replaceChildren(el('p', null, 'لا توجد نتائج لهذا البحث.')); empty.hidden = false;
+    } else empty.hidden = true;
+    const folders = [...new Set(state.items.map((i) => i.folder).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ar'));
+    $('#folders').replaceChildren(...folders.map((f) => { const o = el('option'); o.value = f; return o; }));
+  }
+
+  function actionBtn(iconName, label, title, fn) {
+    const b = el('button', 'icon-btn'); b.type = 'button'; b.title = title; b.setAttribute('aria-label', title);
+    b.innerHTML = icon(iconName);
+    if (label) b.append(el('span', 'lbl', label));
+    b.addEventListener('click', (e) => { e.stopPropagation(); fn(); });
+    return b;
+  }
+
+  function row(it, first) {
+    const li = el('li', 'item' + (first ? ' first' : ''));
+    const main = el('button', 'item-main'); main.type = 'button'; main.title = 'فتح وتعديل';
+    main.addEventListener('click', () => openEditor(it.id));
+    const av = el('span', 'avatar', (it.name.trim()[0] || '؟').toUpperCase()); av.style.background = avatarColor(it.name);
+    const text = el('span', 'item-text');
+    const title = el('div', 'item-title', it.name); title.dir = 'auto';
+    if (it.folder) title.append(el('span', 'tag', it.folder));
+    const sub = el('div', 'item-sub', [it.username, it.url ? host(it.url) : ''].filter(Boolean).join(' · ') || '—'); sub.dir = 'auto';
+    text.append(title, sub); main.append(av, text);
+    const actions = el('div', 'item-actions');
+    if (it.username) actions.append(actionBtn('user', 'المستخدم', 'نسخ اسم المستخدم', () => copyText(it.username, 'اسم المستخدم')));
+    if (it.password) actions.append(actionBtn('key', 'كلمة المرور', 'نسخ كلمة المرور', () => copyText(it.password, 'كلمة المرور')));
+    if (it.url) actions.append(actionBtn('open', null, 'فتح الموقع', () => openUrl(it.url)));
+    li.append(main, actions);
+    return li;
+  }
+
+  $('#search').addEventListener('input', render);
+  $('#search').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const first = state.visible[0];
+      if (first && $('#search').value.trim()) {
+        if (first.password) copyText(first.password, 'كلمة مرور «' + first.name + '»'); else toast('هذا الحساب بلا كلمة مرور');
+      }
+    } else if (e.key === 'Escape') { $('#search').value = ''; render(); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!state.key || document.querySelector('dialog[open]')) return;
+    const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement && document.activeElement.tagName);
+    if ((e.key === '/' && !typing) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) { e.preventDefault(); $('#search').focus(); $('#search').select(); }
+  });
+
+  // ===== النسخ والفتح =====
+  let clipTimer = null;
+  async function copyText(text, label) {
+    if (!text) { toast('الحقل فارغ'); return; }
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; }
+    catch (e) {
+      const ta = el('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.append(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (e2) { } ta.remove();
+    }
+    if (!ok) { toast('تعذر النسخ في هذا المتصفح'); return; }
+    toast('تم نسخ ' + label + ' — يُمسح من الحافظة بعد 30 ثانية');
+    clearTimeout(clipTimer);
+    clipTimer = setTimeout(() => { if (navigator.clipboard) navigator.clipboard.writeText('').catch(() => { }); }, CLIP_CLEAR_MS);
+  }
+  function openUrl(u) {
+    const url = withProto(u);
+    if (!/^https?:\/\//i.test(url)) { toast('الرابط غير صالح للفتح'); return; }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  // ===== الإضافة والتعديل =====
+  function openEditor(id) {
+    const it = id ? state.items.find((x) => x.id === id) : null;
+    state.editingId = it ? it.id : null;
+    $('#editor-title').textContent = it ? 'تعديل الحساب' : 'حساب جديد';
+    $('#f-name').value = it ? it.name : ($('#search').value.trim() && !state.visible.length ? $('#search').value.trim() : '');
+    $('#f-username').value = it ? it.username : '';
+    $('#f-password').value = it ? it.password : '';
+    $('#f-password').type = 'password';
+    $('#f-url').value = it ? it.url : '';
+    $('#f-folder').value = it ? it.folder : '';
+    $('#f-notes').value = it ? it.notes : '';
+    $('#f-delete').hidden = !it;
+    $('#editor-msg').textContent = '';
+    $('#editor').showModal();
+    if (!it) $('#f-name').focus();
+  }
+  $('#btn-add').addEventListener('click', () => openEditor(null));
+  $('#f-toggle').addEventListener('click', () => { const p = $('#f-password'); p.type = p.type === 'password' ? 'text' : 'password'; });
+  $('#f-copy-pw').addEventListener('click', () => copyText($('#f-password').value, 'كلمة المرور'));
+  $('#f-copy-user').addEventListener('click', () => copyText($('#f-username').value, 'اسم المستخدم'));
+
+  function genPassword(len, symbols) {
+    const sets = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnopqrstuvwxyz', '23456789'];
+    if (symbols) sets.push('!@#$%^&*-_=+?');
+    const all = sets.join('');
+    const out = sets.map((s) => s[randInt(s.length)]);
+    while (out.length < len) out.push(all[randInt(all.length)]);
+    for (let i = out.length - 1; i > 0; i--) { const j = randInt(i + 1); [out[i], out[j]] = [out[j], out[i]]; }
+    return out.join('');
+  }
+  $('#f-generate').addEventListener('click', () => {
+    const cur = $('#f-password').value;
+    if (cur && state.editingId && !confirm('ستُستبدل كلمة المرور الحالية لهذا الحساب. متابعة؟')) return;
+    let len = parseInt($('#g-len').value, 10); if (!(len >= 8)) len = 20; len = Math.min(64, len); $('#g-len').value = len;
+    $('#f-password').value = genPassword(len, $('#g-sym').checked); $('#f-password').type = 'text';
+  });
+
+  $('#editor-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+      name: $('#f-name').value.trim(), username: $('#f-username').value.trim(), password: $('#f-password').value,
+      url: $('#f-url').value.trim(), folder: $('#f-folder').value.trim(), notes: $('#f-notes').value
+    };
+    if (!data.name) { $('#editor-msg').textContent = 'اكتب اسم الحساب.'; $('#f-name').focus(); return; }
+    const before = state.items.map((x) => ({ ...x }));
+    if (state.editingId) { const it = state.items.find((x) => x.id === state.editingId); Object.assign(it, data, { updated: Date.now() }); }
+    else state.items.push({ id: newId(), ...data, created: Date.now(), updated: Date.now() });
+    try { await save(); } catch (err) { state.items = before; $('#editor-msg').textContent = 'تعذر الحفظ: ' + err.message; return; }
+    $('#editor').close(); render(); updateBanner(); toast('تم الحفظ');
+  });
+  $('#f-delete').addEventListener('click', async () => {
+    const it = state.items.find((x) => x.id === state.editingId); if (!it) return;
+    if (!confirm('حذف «' + it.name + '»؟ لا يمكن التراجع إلا من نسخة احتياطية.')) return;
+    const before = state.items; state.items = state.items.filter((x) => x.id !== it.id);
+    try { await save(); } catch (err) { state.items = before; toast('تعذر الحذف'); return; }
+    $('#editor').close(); render(); toast('تم الحذف');
+  });
+
+  // ===== النوافذ =====
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
+  $('#btn-lock').addEventListener('click', () => lock(''));
+  $('#btn-settings').addEventListener('click', () => {
+    const m = readMeta();
+    $('#last-backup').textContent = m.lastBackup ? 'آخر نسخة: ' + fmtDate(m.lastBackup) : 'لم تُؤخذ أي نسخة بعد';
+    $('#settings').showModal();
+  });
+
+  function askPassword({ title, message, confirm = false, okText = 'متابعة', label = 'كلمة المرور' }) {
+    return new Promise((resolve) => {
+      const d = $('#pwdialog'), form = $('#pw-form');
+      $('#pw-title').textContent = title; $('#pw-msg').textContent = message || ''; $('#pw-msg').hidden = !message;
+      $('#pw-label1').textContent = label;
+      $('#pw-1').value = ''; $('#pw-2').value = ''; $('#pw-2-wrap').hidden = !confirm; $('#pw-err').textContent = '';
+      $('#pw-ok').textContent = okText;
+      const done = (v) => { form.onsubmit = null; $('#pw-cancel').onclick = null; d.onclose = null; if (d.open) d.close(); resolve(v); };
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const a = $('#pw-1').value, b = $('#pw-2').value;
+        if (!a) return;
+        if (confirm && a.length < 10) { $('#pw-err').textContent = '10 أحرف على الأقل.'; return; }
+        if (confirm && a !== b) { $('#pw-err').textContent = 'التأكيد لا يطابق.'; return; }
+        done(a);
+      };
+      $('#pw-cancel').onclick = () => done(null);
+      d.onclose = () => done(null);
+      d.showModal(); $('#pw-1').focus();
+    });
+  }
+
+  // ===== النسخ الاحتياطي =====
+  function updateBanner() {
+    const m = readMeta(), ban = $('#backup-banner');
+    if (!state.items.length) { ban.hidden = true; return; }
+    const days = m.lastBackup ? (Date.now() - m.lastBackup) / 86400000 : Infinity;
+    const changedSince = !m.lastBackup || state.items.some((i) => i.updated > m.lastBackup);
+    if (days >= BACKUP_REMIND_DAYS || (!m.lastBackup)) {
+      $('#backup-banner-text').textContent = m.lastBackup ? 'آخر نسخة احتياطية قبل ' + Math.floor(days) + ' يومًا.' : 'لم تأخذ نسخة احتياطية بعد. إذا مُسحت بيانات المتصفح ستفقد الخزنة.';
+      ban.hidden = false;
+    } else if (changedSince && days >= 1) {
+      $('#backup-banner-text').textContent = 'عدّلت حسابات بعد آخر نسخة احتياطية.'; ban.hidden = false;
+    } else ban.hidden = true;
+  }
+
+  function exportBackup() {
+    const blob = readBlob(); if (!blob) return;
+    const file = new Blob([JSON.stringify(blob, null, 1)], { type: 'application/json' });
+    const a = el('a'); a.href = URL.createObjectURL(file);
+    a.download = 'khazna-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    const m = readMeta(); m.lastBackup = Date.now(); writeMeta(m);
+    updateBanner();
+    const lb = $('#last-backup'); if (lb) lb.textContent = 'آخر نسخة: ' + fmtDate(m.lastBackup);
+    toast('تم تنزيل النسخة الاحتياطية (مشفرة). احفظها في Google Drive أو مكان آمن.', 4000);
+  }
+
+  async function restoreFromFile(file) {
+    let blob;
+    try { blob = JSON.parse(await file.text()); } catch (e) { toast('الملف غير صالح'); return; }
+    if (!blob || blob.app !== 'khazna') {
+      if (blob && Array.isArray(blob.items) || (blob && 'encrypted' in blob)) toast('هذا ملف Bitwarden. أنشئ الخزنة أولًا ثم استورده من الإعدادات.', 4500);
+      else toast('هذا ليس ملف نسخة احتياطية من خزنتي');
+      return;
+    }
+    const pw = await askPassword({ title: 'فتح النسخة الاحتياطية', message: 'أدخل كلمة المرور الرئيسية التي كانت مستخدمة عند أخذ هذه النسخة.' });
+    if (pw == null) return;
+    toast('جارٍ فك التشفير...', 8000);
+    let r;
+    try { r = await decryptVault(blob, pw); } catch (e) { toast('كلمة المرور غير صحيحة أو الملف تالف'); return; }
+    if (readBlob() && !confirm('ستُستبدل الخزنة الموجودة على هذا الجهاز بمحتوى النسخة الاحتياطية (' + r.items.length + ' حساب). متابعة؟')) { toast('أُلغيت الاستعادة'); return; }
+    closeDialogs();
+    writeBlob(blob); Object.assign(state, r);
+    const m = readMeta(); m.lastBackup = Date.now(); writeMeta(m);
+    requestPersist(); enterMain();
+    toast('تمت الاستعادة: ' + r.items.length + ' حساب');
+  }
+
+  // ===== استيراد Bitwarden =====
+  async function importBitwarden(file) {
+    let j;
+    try { j = JSON.parse(await file.text()); } catch (e) { toast('الملف غير صالح'); return; }
+    if (j && j.encrypted) { alert('هذا تصدير مشفر من Bitwarden.\n\nصدّر مرة أخرى واختر الصيغة ".json" العادية (غير المشفرة)، ثم استورد الملف هنا واحذفه فورًا بعد الاستيراد.'); return; }
+    if (!j || !Array.isArray(j.items)) { toast('هذا ليس ملف تصدير Bitwarden بصيغة JSON'); return; }
+    const folders = new Map((Array.isArray(j.folders) ? j.folders : []).map((f) => [f.id, str(f.name, 100)]));
+    const sig = (it) => [it.name, it.username, it.password, it.notes].join('\u0000');
+    const existing = new Set(state.items.map(sig));
+    let added = 0, dup = 0, skipped = 0, passkeys = 0, totp = 0;
+    const before = state.items.slice();
+    for (const b of j.items) {
+      let e;
+      if (b && b.type === 1) {
+        const l = b.login || {};
+        const uris = Array.isArray(l.uris) ? l.uris.map((u) => u && u.uri).filter(Boolean) : [];
+        let notes = str(b.notes);
+        if (uris.length > 1) notes = (notes ? notes + '\n\n' : '') + 'روابط أخرى:\n' + uris.slice(1).join('\n');
+        e = { name: str(b.name, 300), username: str(l.username, 500), password: str(l.password, 2000), url: str(uris[0], 2000), notes, folder: folders.get(b.folderId) || '' };
+        if (Array.isArray(l.fido2Credentials) && l.fido2Credentials.length) passkeys++;
+        if (l.totp) totp++;
+      } else if (b && b.type === 2) {
+        e = { name: str(b.name, 300), username: '', password: '', url: '', notes: str(b.notes), folder: folders.get(b.folderId) || '' };
+      } else { skipped++; continue; }
+      if (!e.name) e.name = e.url ? host(e.url) : 'بدون اسم';
+      if (existing.has(sig(e))) { dup++; continue; }
+      existing.add(sig(e));
+      state.items.push({ id: newId(), ...e, created: Date.now(), updated: Date.now() });
+      added++;
+    }
+    try { await save(); } catch (err) { state.items = before; alert('تعذر حفظ الاستيراد: ' + err.message); return; }
+    closeDialogs(); render(); updateBanner();
+    let msg = 'تم الاستيراد من Bitwarden:\n• أُضيف: ' + added + ' عنصر';
+    if (dup) msg += '\n• مكرر وتم تجاهله: ' + dup;
+    if (skipped) msg += '\n• بطاقات وهويات لم تُنقل: ' + skipped;
+    if (passkeys) msg += '\n• حسابات فيها مفتاح مرور (Passkey): ' + passkeys + ' — نُقلت كلمة المرور فقط، ومفتاح المرور يبقى في Bitwarden';
+    if (totp) msg += '\n• حسابات فيها رمز تحقق (TOTP): ' + totp + ' — لم يُنقل الرمز، ويبقى في Bitwarden';
+    msg += '\n\nمهم: احذف ملف التصدير من جهازك الآن، فهو غير مشفر.';
+    alert(msg);
+  }
+
+  // ===== تغيير كلمة المرور الرئيسية =====
+  async function changeMaster() {
+    const cur = await askPassword({ title: 'كلمة المرور الحالية', label: 'كلمة المرور الرئيسية الحالية' });
+    if (cur == null) return;
+    try { await decryptVault(readBlob(), cur); } catch (e) { toast('كلمة المرور الحالية غير صحيحة'); return; }
+    const nw = await askPassword({ title: 'كلمة المرور الجديدة', message: '10 أحرف على الأقل. لا يمكن استرجاعها إذا نسيتها.', confirm: true, label: 'كلمة المرور الجديدة', okText: 'تغيير' });
+    if (nw == null) return;
+    const old = { key: state.key, salt: state.salt, iter: state.iter };
+    try {
+      state.salt = randBytes(16); state.iter = ITER; state.key = await deriveKey(nw, state.salt, ITER); await save();
+    } catch (e) { Object.assign(state, old); toast('تعذر التغيير'); return; }
+    alert('تم تغيير كلمة المرور الرئيسية.\n\nخذ نسخة احتياطية جديدة الآن: النسخ القديمة ما زالت تُفتح بكلمة المرور القديمة.');
+  }
+
+  // ===== ربط الأزرار =====
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-action]'); if (!t) return;
+    const a = t.dataset.action;
+    if (a === 'export') exportBackup();
+    else if (a === 'restore') $('#file-backup').click();
+    else if (a === 'import-bw') $('#file-bw').click();
+    else if (a === 'change-pw') changeMaster();
+  });
+  $('#file-backup').addEventListener('change', async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) await restoreFromFile(f); });
+  $('#file-bw').addEventListener('change', async (e) => {
+    const f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    if (!state.key) { toast('افتح الخزنة أولًا'); return; }
+    await importBitwarden(f);
+  });
+
+  // تشغيل بدون إنترنت وتثبيت كتطبيق (يعمل فقط على https أو localhost)
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(() => { });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
